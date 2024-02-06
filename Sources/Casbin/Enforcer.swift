@@ -174,7 +174,7 @@ extension Enforcer {
                     return try? makeExpression(scope: scope, parsed: exp).evaluate()
                 }
             }
-            if case let .variable(s) = symbol, !(s.hasPrefix("\"") && s.hasSuffix("\"")) && s != "false" && s != "true" {
+           if case let .variable(s) = symbol, !isVariableConstant(s) {
                 let sp = s.split(separator: ".").map { String($0)}
                 if sp.count > 1 {
                     var objcet = scope[sp[0]]
@@ -363,7 +363,14 @@ extension Enforcer {
     public var isFiltered:Bool {
         return adapter.isFiltered
     }
-    
+
+    private func isVariableConstant(_ variable: String) -> Bool {
+        (variable.hasPrefix("\"") && variable.hasSuffix("\"")) ||
+        (variable.hasPrefix("\'") && variable.hasSuffix("\'")) ||
+        variable == "false" ||
+        variable == "true"
+    }
+
 }
 
 extension Enforcer: CoreApi {
